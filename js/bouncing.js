@@ -5,20 +5,20 @@ export const bouncingBalls = {
   canvas: null,
   ctx: null,
 
-  init(ctx, canvas, count = 10) {
+  init(ctx, canvas, count = 10, velocity = 1.0) {
     this.canvas = canvas;
     this.ctx = ctx;
     this.balls = [];
-
+  
     for (let i = 0; i < count; i++) {
       const radius = 10 + Math.random() * 10;
       this.balls.push({
         x: Math.random() * (canvas.width - 2 * radius) + radius,
         y: Math.random() * (canvas.height - 2 * radius) + radius,
-        dx: (Math.random() - 0.5) * 4,
-        dy: (Math.random() - 0.5) * 4,
+        dx: (Math.random() - 0.5) * 4 * velocity,
+        dy: (Math.random() - 0.5) * 4 * velocity,
         radius,
-        mass: radius, // Let's set mass proportional to radius for more realistic collisions
+        mass: radius,
       });
     }
   },

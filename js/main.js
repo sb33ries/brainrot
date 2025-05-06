@@ -9,26 +9,40 @@ canvas.height = 400;
 
 const select = document.getElementById("animation-select");
 const controls = document.getElementById("controls");
-const slider = document.getElementById("ball-count");
-const countDisplay = document.getElementById("ball-count-display");
+
+const ballCountSlider = document.getElementById("ball-count");
+const ballCountDisplay = document.getElementById("ball-count-display");
+
+const velocitySlider = document.getElementById("velocity");
+const velocityDisplay = document.getElementById("velocity-display");
 
 let animation;
 let current = null;
 
-slider.addEventListener("input", () => {
-  countDisplay.textContent = slider.value;
+// Update ball count display and re-initialize
+ballCountSlider.addEventListener("input", () => {
+  ballCountDisplay.textContent = ballCountSlider.value;
   if (current === "bouncing") {
-    bouncingBalls.init(ctx, canvas, parseInt(slider.value));
+    bouncingBalls.init(ctx, canvas, parseInt(ballCountSlider.value), parseFloat(velocitySlider.value));
   }
 });
 
+// Update velocity display and re-initialize
+velocitySlider.addEventListener("input", () => {
+  velocityDisplay.textContent = velocitySlider.value;
+  if (current === "bouncing") {
+    bouncingBalls.init(ctx, canvas, parseInt(ballCountSlider.value), parseFloat(velocitySlider.value));
+  }
+});
+
+// Handle animation mode switching
 select.addEventListener("change", () => {
   cancelAnimationFrame(animation);
   current = select.value;
 
   if (current === "bouncing") {
     controls.style.display = "block";
-    bouncingBalls.init(ctx, canvas, parseInt(slider.value));
+    bouncingBalls.init(ctx, canvas, parseInt(ballCountSlider.value), parseFloat(velocitySlider.value));
   } else {
     controls.style.display = "none";
     pendulum.init(ctx, canvas);
@@ -46,8 +60,8 @@ function animate() {
   animation = requestAnimationFrame(animate);
 }
 
-// Start initial animation
+// Initial setup
 current = select.value;
 controls.style.display = current === "bouncing" ? "block" : "none";
-bouncingBalls.init(ctx, canvas, parseInt(slider.value));
+bouncingBalls.init(ctx, canvas, parseInt(ballCountSlider.value), parseFloat(velocitySlider.value));
 animate();
