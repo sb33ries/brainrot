@@ -1,30 +1,32 @@
 export const pendulum = {
-    angle: Math.PI / 4,
-    length: 160,
-    origin: { x: 300, y: 50 },
-    aVel: 0,
-    aAcc: 0,
-    damping: 0.995,
-    gravity: 0.5,
+  pendulums: [],
+  numPendulums: 10,
+  length: 160,
+  origin: { x: 300, y: 60 },
+  time: 0,
 
-    init(ctx, canvas) {
-      this.ctx = ctx;
-      this.canvas = canvas;
-    },
+  init(ctx, canvas) {
+    this.ctx = ctx;
+    this.canvas = canvas;
+    this.origin.x = canvas.width / 2;
 
-    draw() {
-      const ctx = this.ctx;
+    this.pendulums = Array.from({ length: this.numPendulums }, (_, i) => ({
+      frequency: 0.03 + i * 0.001, // small differences in frequency
+      initialAngle: Math.PI / 4,
+      color: `hsl(${(i * 360) / this.numPendulums}, 80%, 60%)`
+    }));
+  },
 
-      this.aAcc = (-1 * this.gravity / this.length) * Math.sin(this.angle);
-      this.aVel += this.aAcc;
-      this.aVel *= this.damping;
-      this.angle += this.aVel;
+  draw() {
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      const x = this.origin.x + this.length * Math.sin(this.angle);
-      const y = this.origin.y + this.length * Math.cos(this.angle);
+    this.pendulums.forEach((p, i) => {
+      const angle = p.initialAngle * Math.cos(p.frequency * this.time);
+      const x = this.origin.x + this.length * Math.sin(angle);
+      const y = this.origin.y + this.length * Math.cos(angle);
 
-      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
+      // Rod
       ctx.beginPath();
       ctx.moveTo(this.origin.x, this.origin.y);
       ctx.lineTo(x, y);
@@ -32,11 +34,17 @@ export const pendulum = {
       ctx.lineWidth = 2;
       ctx.stroke();
 
+      // Ball
       ctx.beginPath();
-      ctx.arc(x, y, 20, 0, Math.PI * 2);
-      ctx.fillStyle = "lime";
+      ctx.arc(x, y, 16, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 20;
       ctx.fill();
       ctx.closePath();
-    }
-  };
-  
+      ctx.shadowBlur = 0;
+    });
+
+    this.time += 1; // Time steps for animation
+  }
+};
