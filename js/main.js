@@ -24,8 +24,11 @@ ballCountSlider.addEventListener("input", () => {
   ballCountDisplay.textContent = ballCountSlider.value;
   if (current === "bouncing") {
     bouncingBalls.init(ctx, canvas, parseInt(ballCountSlider.value), parseFloat(velocitySlider.value));
+  } else if (current === "pendulum") {
+    pendulum.init(ctx, canvas, parseInt(ballCountSlider.value));
   }
 });
+
 
 // Update velocity display and re-initialize
 velocitySlider.addEventListener("input", () => {
@@ -42,14 +45,17 @@ select.addEventListener("change", () => {
 
   if (current === "bouncing") {
     controls.style.display = "block";
+    velocitySlider.parentElement.style.display = "block";
     bouncingBalls.init(ctx, canvas, parseInt(ballCountSlider.value), parseFloat(velocitySlider.value));
   } else {
-    controls.style.display = "none";
-    pendulum.init(ctx, canvas);
+    controls.style.display = "block";
+    velocitySlider.parentElement.style.display = "none"; // Hide velocity slider for pendulum
+    pendulum.init(ctx, canvas, parseInt(ballCountSlider.value));
   }
 
   animate();
 });
+
 
 function animate() {
   if (current === "bouncing") {
@@ -62,6 +68,12 @@ function animate() {
 
 // Initial setup
 current = select.value;
-controls.style.display = current === "bouncing" ? "block" : "none";
-bouncingBalls.init(ctx, canvas, parseInt(ballCountSlider.value), parseFloat(velocitySlider.value));
+controls.style.display = "block";
+if (current === "bouncing") {
+  velocitySlider.parentElement.style.display = "block";
+  bouncingBalls.init(ctx, canvas, parseInt(ballCountSlider.value), parseFloat(velocitySlider.value));
+} else {
+  velocitySlider.parentElement.style.display = "none";
+  pendulum.init(ctx, canvas, parseInt(ballCountSlider.value));
+}
 animate();

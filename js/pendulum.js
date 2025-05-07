@@ -5,17 +5,20 @@ export const pendulum = {
   origin: { x: 300, y: 60 },
   time: 0,
 
-  init(ctx, canvas) {
+  init(ctx, canvas, count = 10) {
     this.ctx = ctx;
     this.canvas = canvas;
     this.origin.x = canvas.width / 2;
-
+    this.numPendulums = count;
+    this.time = 0;
+  
     this.pendulums = Array.from({ length: this.numPendulums }, (_, i) => ({
-      frequency: 0.03 + i * 0.001, // small differences in frequency
+      frequency: 0.03 + i * 0.001,
       initialAngle: Math.PI / 4,
       color: `hsl(${(i * 360) / this.numPendulums}, 80%, 60%)`
     }));
   },
+  
 
   draw() {
     const ctx = this.ctx;
