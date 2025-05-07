@@ -16,8 +16,27 @@ const ballCountDisplay = document.getElementById("ball-count-display");
 const velocitySlider = document.getElementById("velocity");
 const velocityDisplay = document.getElementById("velocity-display");
 
+const musicToggle = document.getElementById("music-toggle");
+const music = document.getElementById("background-music");
+
 let animation;
 let current = null;
+
+// Ensure music plays only if user interacted (for browser autoplay policies)
+window.addEventListener("click", () => {
+  if (music.paused && musicToggle.checked) {
+    music.play();
+  }
+}, { once: true });
+
+// Toggle music on/off
+musicToggle.addEventListener("change", () => {
+  if (musicToggle.checked) {
+    music.play();
+  } else {
+    music.pause();
+  }
+});
 
 // Update ball count display and re-initialize
 ballCountSlider.addEventListener("input", () => {
