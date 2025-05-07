@@ -9,9 +9,10 @@ export const bouncingBalls = {
     this.canvas = canvas;
     this.ctx = ctx;
     this.balls = [];
-  
+
     for (let i = 0; i < count; i++) {
       const radius = 10 + Math.random() * 10;
+      const hue = Math.floor(Math.random() * 360); // random hue
       this.balls.push({
         x: Math.random() * (canvas.width - 2 * radius) + radius,
         y: Math.random() * (canvas.height - 2 * radius) + radius,
@@ -19,6 +20,8 @@ export const bouncingBalls = {
         dy: (Math.random() - 0.5) * 4 * velocity,
         radius,
         mass: radius,
+        color: `hsl(${hue}, 80%, 60%)`,
+        glow: `0 0 15px hsl(${hue}, 100%, 70%)`
       });
     }
   },
@@ -34,7 +37,6 @@ export const bouncingBalls = {
       b.x += b.dx;
       b.y += b.dy;
 
-      // Wall collision detection
       if (b.x - b.radius < 0) {
         b.x = b.radius;
         b.dx *= -1;
@@ -53,7 +55,7 @@ export const bouncingBalls = {
       }
     }
 
-    // Ball-ball collisions
+    // Ball-ball collisions (unchanged)
     for (let i = 0; i < this.balls.length; i++) {
       for (let j = i + 1; j < this.balls.length; j++) {
         const b1 = this.balls[i];
@@ -65,7 +67,6 @@ export const bouncingBalls = {
         const minDist = b1.radius + b2.radius;
 
         if (distance < minDist) {
-          // Move balls so they're just touching
           const overlap = 0.5 * (minDist - distance);
           const offsetX = (dx / distance) * overlap;
           const offsetY = (dy / distance) * overlap;
@@ -75,24 +76,19 @@ export const bouncingBalls = {
           b2.x += offsetX;
           b2.y += offsetY;
 
-          // Collision response
           const angle = Math.atan2(dy, dx);
           const sin = Math.sin(angle);
           const cos = Math.cos(angle);
 
-          // Rotate velocities to collision axis
           const v1 = rotate(b1.dx, b1.dy, sin, cos, true);
           const v2 = rotate(b2.dx, b2.dy, sin, cos, true);
 
-          // 1D elastic collision
           const v1xAfter = (v1.x * (b1.mass - b2.mass) + 2 * b2.mass * v2.x) / (b1.mass + b2.mass);
           const v2xAfter = (v2.x * (b2.mass - b1.mass) + 2 * b1.mass * v1.x) / (b1.mass + b2.mass);
 
-          // Keep y velocities
           const v1Final = { x: v1xAfter, y: v1.y };
           const v2Final = { x: v2xAfter, y: v2.y };
 
-          // Rotate velocities back
           const v1Rotated = rotate(v1Final.x, v1Final.y, sin, cos, false);
           const v2Rotated = rotate(v2Final.x, v2Final.y, sin, cos, false);
 
@@ -104,13 +100,17 @@ export const bouncingBalls = {
       }
     }
 
-    // Draw balls
+    // Draw balls with glow
     for (const b of this.balls) {
+      ctx.save();
       ctx.beginPath();
       ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "cyan";
+      ctx.shadowColor = b.color;
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = b.color;
       ctx.fill();
       ctx.closePath();
+      ctx.restore();
     }
   }
 };
